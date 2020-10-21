@@ -4,7 +4,6 @@
 *.xml
 *.iml
 *.db
-sqlite.py
 test.py
 *.txt
 *.zip
