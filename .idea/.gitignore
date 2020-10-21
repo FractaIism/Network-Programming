@@ -1,0 +1,8 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+*.xml
+*.iml
+*.db
+sqlite.py
+test.py
