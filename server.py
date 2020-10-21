@@ -1,8 +1,10 @@
 #!/usr/bin/python3
 import socket, threading, sqlite3, inspect, json, os, time, sys, random
 
+arg_c = len(sys.argv)
+
 host = ''  # bind to this machine
-port = 9746
+port = 9746 if arg_c < 2 else int(sys.argv[1])
 sqlite_db = 'mydb.db'
 bufsize = 4096
 
@@ -42,7 +44,7 @@ def TCP_listener():
         ssock_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         ssock_tcp.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         ssock_tcp.bind((host, port))
-        ssock_tcp.listen(5)
+        ssock_tcp.listen(10)
         print("TCP socket created, waiting for connections...")
         # await client connections (use separate thread for each connection)
         while True:
