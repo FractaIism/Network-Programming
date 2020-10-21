@@ -1,9 +1,8 @@
 import socket, json, sys
 
 try:
-    print(sys.argv)
-    print(len(sys.argv))
-    print(sys.argv[0])
-    print(123 if sys.argv[1] is not None else 432)
+    csockUDP = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    csockUDP.connect(('localhost', 7854))
+    print(csockUDP)
 except Exception as e:
     print("Exception: ", e)

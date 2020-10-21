@@ -1,9 +1,8 @@
+#!/usr/bin/python3
 import socket, threading, sqlite3, inspect, json, os, time, sys, random
 
 host = ''  # bind to this machine
-TCP_port = 6573
-# UDP_port = 7923
-UDP_port = 6573
+port = 9746
 sqlite_db = 'mydb.db'
 bufsize = 4096
 
@@ -41,7 +40,8 @@ def TCP_listener():
     try:
         # print("TCP listener")
         ssock_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        ssock_tcp.bind((host, TCP_port))
+        ssock_tcp.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        ssock_tcp.bind((host, port))
         ssock_tcp.listen(5)
         print("TCP socket created, waiting for connections...")
         # await client connections (use separate thread for each connection)
@@ -52,6 +52,7 @@ def TCP_listener():
             thread.start()
     except KeyboardInterrupt as kb:
         print("Server process terminated.")
+        ssock_tcp.close()
         exit()
     except Exception as e:
         ExceptionInfo()
@@ -60,7 +61,8 @@ def UDP_listener():
     try:
         # print("UDP listener")
         ssock_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        ssock_udp.bind((host, UDP_port))
+        ssock_udp.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        ssock_udp.bind((host, port))
         print("UDP socket created, waiting for connections...")
         # await client command (use separate thread for each command)
         while True:
@@ -69,6 +71,7 @@ def UDP_listener():
             thread.start()
     except KeyboardInterrupt as kb:
         print("Server process terminated.")
+        ssock_udp.close()
         exit()
     except Exception as e:
         ExceptionInfo()
@@ -76,7 +79,7 @@ def UDP_listener():
 def parseCommandTCP(tcp_conn, addr):
     # sqlite
     sqlite_conn = sqlite3.connect(sqlite_db, uri = True)
-    sqlite_conn.isolation_level = None
+    sqlite_conn.isolation_level = None  # autocommit mode
     sqlite_cursor = sqlite_conn.cursor()
 
     session_id = -1  # -1 when not logged in, positive int when logged in
@@ -86,7 +89,7 @@ def parseCommandTCP(tcp_conn, addr):
             # receive command from client
             data = tcp_conn.recv(bufsize)
             if not data:
-                raise Exception("Connection closed by peer")
+                raise ConnectionError("Connection force closed by peer.")
             command = data.decode()
             argv = str(command).split()
             argc = len(argv)  # not needed, syntax check done on client side
@@ -132,6 +135,7 @@ def parseCommandTCP(tcp_conn, addr):
             elif argv[0] == 'exit':
                 sqlite_cursor.execute("DELETE FROM sessions WHERE session_id = ? ", [session_id])
                 tcp_conn.close()
+                print(f"User {addr} has exited.")
                 return
 
             else:
@@ -146,8 +150,13 @@ def parseCommandTCP(tcp_conn, addr):
                 tcp_conn.send(errmsg.encode())
                 raise Exception(errmsg)
 
-        except KeyboardInterrupt as kb:
+        except KeyboardInterrupt:
             print("Server process terminated.")
+            tcp_conn.close()
+            exit()
+        except ConnectionError:
+            ExceptionInfo()
+            tcp_conn.close()
             exit()
         except Exception as e:
             ExceptionInfo()
@@ -160,7 +169,7 @@ def parseCommandUDP(data, addr):
         socket_udp.connect(addr)
         # sqlite
         sqlite_conn = sqlite3.connect(sqlite_db, uri = True)
-        sqlite_conn.isolation_level = None
+        sqlite_conn.isolation_level = None  # autocommit mode
         sqlite_cursor = sqlite_conn.cursor()
         # receive command from client
         command = data.decode()
@@ -196,8 +205,13 @@ def parseCommandUDP(data, addr):
                 socket_udp.send(MSG_Encode(1847, errmsg))
                 raise Exception(errmsg)  # socket_udp.send(MSG_Encode(0, "Debugging..."))
 
-    except KeyboardInterrupt as kb:
+    except KeyboardInterrupt:
         print("Server process terminated.")
+        socket_udp.close()
+        exit()
+    except ConnectionError:
+        ExceptionInfo()
+        socket_udp.close()
         exit()
     except Exception as e:
         ExceptionInfo()

@@ -1,12 +1,11 @@
+#!/usr/bin/python3
 import socket, json, sys
 
-argc = len(sys.argv)
+arg_c = len(sys.argv)
 
-remoteHost = 'localhost'
-remoteTCPport = 6573
-# remoteUDPport = 7923
-remoteUDPport = 6573
-bufsize = 4096
+remoteHost = 'localhost' if arg_c < 2 else sys.argv[1]
+remotePort = 9746 if arg_c < 3 else int(sys.argv[2])
+bufsize = 1024
 
 def MSG_Decode(bytestream: bytes):
     msg_str = bytestream.decode()
@@ -16,8 +15,10 @@ def MSG_Decode(bytestream: bytes):
 session_id = -1
 username = None
 csockTCP = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-csockTCP.connect((remoteHost, remoteTCPport))
+csockTCP.connect((remoteHost, remotePort))
 csockUDP = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+# print(f"Connected to server at {remoteHost}:{remotePort}")
+print("********************************\n** Welcome to the BBS server. **\n********************************")
 
 while True:
     input_str = input('% ')
@@ -29,7 +30,7 @@ while True:
         if argc != 4:
             print("Usage: register <username> <email> <password>")
             continue
-        csockUDP.sendto(input_str.encode(), (remoteHost, remoteUDPport))
+        csockUDP.sendto(input_str.encode(), (remoteHost, remotePort))
         msg = csockUDP.recv(bufsize)
         (retcode, message) = MSG_Decode(msg)
         print(message)
@@ -72,7 +73,7 @@ while True:
         elif session_id == -1:
             print("Please login first.")
             continue
-        csockUDP.sendto(f"whoami {session_id}".encode(), (remoteHost, remoteUDPport))
+        csockUDP.sendto(f"whoami {session_id}".encode(), (remoteHost, remotePort))
         msg = csockUDP.recv(bufsize)
         (retcode, message) = MSG_Decode(msg)
         if retcode == 1847:
@@ -86,9 +87,9 @@ while True:
         (retcode, message) = MSG_Decode(msg)
         user_list = json.loads(message)
         # print('user_list=', user_list)
-        print("{:<8} {:<15}".format("Username", "Email"))
+        print("{:<15} {:<15}".format("Username", "Email"))
         for user in user_list:
-            print("{:<8} {:<15}".format(user[0], user[1]))
+            print("{:<15} {:<15}".format(user[0], user[1]))
 
     elif command == 'exit':
         session_id = -1
@@ -99,38 +100,7 @@ while True:
 
     elif command == 'help':
         print(
-            f'''Unknown command '{argv[0]}'.\nCommand list:\nregister <username> <email> <password>\nlogin <username> <password>\nlogout\nwhoami\nlist-user\nexit''')
+            f"Command list:\nregister <username> <email> <password>\nlogin <username> <password>\nlogout\nwhoami\nlist-user\nexit")
 
     else:  # unknown command
-        print("Unknown command. Type 'help' for the list of commands.")
-
-exit()
-
-# # udp
-# try:
-#     csock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-#     # csock.connect((remoteHost, remoteUDPport))
-#     csock.sendto(b"register usrnam mail pass", (remoteHost, remoteUDPport))
-#     msg, addr = csock.recvfrom(bufsize)
-#     print(msg)
-# except Exception as e:
-#     print("Exception caught: ", e)
-# # finally:
-# # 	print("Client execution complete")
-#
-# # tcp
-# try:
-#     csock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#     csock.connect((remoteHost, remoteTCPport))
-#     data = 'list-user'
-#     # csock.send(bytes(name, encoding = 'utf8'))
-#     csock.send(data.encode('utf8'))
-#     data = csock.recv(bufsize)
-#     print(json.loads(data))
-#     csock.close()
-#     while True:
-#         pass
-# except Exception as e:
-#     print("Exception caught: ", e)
-# finally:
-#     print("Client execution complete")
+        print(f"Unknown command '{argv[0]}'. Type 'help' for the list of commands.")
