@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 CLIENT=$1
 SERVER_IP=$2
@@ -30,8 +30,8 @@ tmux split-window -h -p 74
 tmux split-window -h -p 65
 tmux split-window -h -p 50
 
-# cat testcase | 
-# while IFS= read data 
+# cat testcase |
+# while IFS= read data
 # do
 #     tmux send-keys -t 0 "$data" Enter
 #     sleep 1
@@ -59,32 +59,32 @@ do
     # command format incorrect
     tmux send-keys -t ${i} "register user${i} user${i}@qwer.zxcv" Enter
     sleep $SLEEP_TIME
-    tmux send-keys -t ${i} "login user${i}" Enter 
+    tmux send-keys -t ${i} "login user${i}" Enter
     sleep $SLEEP_TIME
 done
 
 echo "Functions test"
 index=0
-for tc in qwer asdf 
+for tc in qwer asdf
 do
     # types wrong account and password
-    tmux send-keys -t ${index} "login ${tc} ${tc}" Enter 
+    tmux send-keys -t ${index} "login ${tc} ${tc}" Enter
     sleep $SLEEP_TIME
     # show login first
-    tmux send-keys -t ${index} "whoami" Enter 
+    tmux send-keys -t ${index} "whoami" Enter
     sleep $SLEEP_TIME
     # show login first
-    tmux send-keys -t ${index} "logout" Enter 
+    tmux send-keys -t ${index} "logout" Enter
     sleep $SLEEP_TIME
 
     # types correct account and password
-    tmux send-keys -t ${index} "login user${index} user${index}" Enter 
+    tmux send-keys -t ${index} "login user${index} user${index}" Enter
     sleep $SLEEP_TIME
     # show logout first
-    tmux send-keys -t ${index} "login user${index} user${index}" Enter 
+    tmux send-keys -t ${index} "login user${index} user${index}" Enter
     sleep $SLEEP_TIME
     # show username
-    tmux send-keys -t ${index} "whoami" Enter 
+    tmux send-keys -t ${index} "whoami" Enter
     sleep $SLEEP_TIME
     # show bye message
     tmux send-keys -t ${index} "logout" Enter
@@ -101,11 +101,11 @@ do
     let "index=9-i"
     tmux send-keys -t ${index} "login user${i} user${i}" Enter
     sleep $SLEEP_TIME
-    tmux send-keys -t ${index} "whoami" Enter 
+    tmux send-keys -t ${index} "whoami" Enter
     sleep $SLEEP_TIME
-    tmux send-keys -t ${index} "logout" Enter 
+    tmux send-keys -t ${index} "logout" Enter
     sleep $SLEEP_TIME
-    tmux send-keys -t ${index} "exit" Enter 
+    tmux send-keys -t ${index} "exit" Enter
     sleep $SLEEP_TIME
 done
 
