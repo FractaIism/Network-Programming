@@ -1,0 +1,34 @@
+            CREATE TABLE boards (
+                idx  INTEGER  PRIMARY KEY  AUTOINCREMENT,
+                name   TEXT,
+                moderator  TEXT
+            );
+            CREATE TABLE posts (
+                serial_number  INTEGER  PRIMARY KEY  AUTOINCREMENT,
+                board   TEXT,
+                title   TEXT,
+                content TEXT,
+                author  TEXT,
+                date    DATETIME  DEFAULT CURRENT_TIMESTAMP
+            );
+            CREATE TABLE comments (
+                idx    INTEGER  PRIMARY KEY  AUTOINCREMENT,
+                post_sn  INT,
+                content  TEXT,
+                author   TEXT
+            );
+
+
+register user1 email1 pass1
+login user1 pass1
+create-board test_board
+create-board yee_haw
+list-board
+create-post yee_haw --title Hello buddy! --content Howdy good mornin
+list-post yee_haw
+comment 1 Good job, comment++
+update-post 1 --title New title
+update-post 1 --content Hello, it's a brand new day!
+read 1
+delete-post 1
+list-post yee_haw
