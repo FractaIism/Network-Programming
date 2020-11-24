@@ -1,4 +1,3 @@
-from modules.SharedVariables import SharedVariables
 from modules.utility import *
 
 # Usage: logout
@@ -14,4 +13,3 @@ def logout(sv: SharedVariables):
     sv.tcp_conn.send(MSG_Encode(0))
     sv.session_id = -1
     sv.username = None
-    print('logout success')

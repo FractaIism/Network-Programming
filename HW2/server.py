@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 from modules import *
 from params import *
 import socket, threading, sqlite3, time
@@ -129,6 +130,7 @@ def parseCommandTCP(tcp_conn: socket.socket, addr):
             else:
                 # unused, handled on client side
                 raise RuntimeError(886068, f"Unknown command '{command}'.")
+            print(command+" success")
 
         except RuntimeError as err:
             # raise RuntimeError to print error on both client and server
@@ -177,7 +179,7 @@ def parseCommandUDP(data, addr):
         ExceptionInfo()
         sv.udp_conn.close()
         exit()
-    except Exception as e:
+    except Exception:
         ExceptionInfo()
     pass
 

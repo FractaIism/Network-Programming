@@ -1,4 +1,3 @@
-from modules.SharedVariables import SharedVariables
 from modules.utility import *
 
 # Usage: list-post <board-name>
@@ -18,5 +17,4 @@ def list_post(sv: SharedVariables):
         _post[3] = ShortDate(_post[3])
         posts[index] = tuple(_post)
     sv.tcp_conn.send(MSG_Encode(0, json.dumps(posts)))
-    print(posts)
-    print("list-post success")
+    # print(posts)

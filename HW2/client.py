@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 from modules.SharedVariables import SharedVariables
 from modules.utility import ExceptionInfo, DoCMD
 from params import *
@@ -108,14 +109,7 @@ def main():
                 else:
                     post_json = json.loads(message)
                     post_info = post_json[0]
-                    # print("Author:", post_info[0])
-                    # print("Title:", post_info[1])
-                    # print("Date:", post_info[2])
-                    # print("--")
-                    # print(post_info[3])
-                    # print("--")
                     print("Author: {}\nTitle: {}\nDate: {}\n--\n{}\n--".format(*post_info))
-                    # if len(post_json) > 1:
                     comments = post_json[1:]
                     for comment in comments:
                         print("{}: {}".format(*comment))

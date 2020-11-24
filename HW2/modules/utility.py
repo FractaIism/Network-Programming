@@ -1,8 +1,6 @@
-import sys, os, inspect, sqlite3, json, socket
+import sys, os, inspect, sqlite3, json
+from params import *
 from modules.SharedVariables import SharedVariables
-
-sqlite_db = 'file:nphw2?mode=memory&cache=shared'
-bufsize = 1024
 
 # print exception info and line number
 def ExceptionInfo(message: str = ""):
@@ -47,6 +45,7 @@ def MSG_Encode(retcode: int, message: str = "Default message") -> bytes:
     }
     return json.dumps(pkg).encode()
 
+# inverse of MSG_Encode
 def MSG_Decode(bytestream: bytes) -> (int, str):
     msg_str = bytestream.decode()
     msg = json.loads(msg_str)
@@ -62,6 +61,7 @@ def PostExists(post_sn: int) -> bool:
     match_count = sqlite_conn.execute("SELECT * FROM posts WHERE serial_number = ? ", [post_sn]).fetchall()
     return len(match_count) > 0
 
+# send command string to server and return response
 def DoCMD(sv: SharedVariables, input_str: str, protocol: str = "TCP") -> (int, str):
     if protocol.upper() == "TCP":
         sv.tcp_conn.send(input_str.encode())

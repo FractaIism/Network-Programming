@@ -1,4 +1,3 @@
-from modules.SharedVariables import SharedVariables
 from modules.utility import *
 
 # Usage: whoami

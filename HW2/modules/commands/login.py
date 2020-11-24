@@ -1,4 +1,3 @@
-from modules.SharedVariables import SharedVariables
 from modules.utility import *
 from random import randint
 
@@ -24,4 +23,3 @@ def login(sv: SharedVariables):
     sv.username = credentials[0]
     sv.sqlite_cursor.execute("INSERT INTO sessions (session_id,username) VALUES (?,?) ", [sv.session_id, sv.username])
     sv.tcp_conn.send(MSG_Encode(0, json.dumps([sv.session_id, sv.username])))
-    print('login success')

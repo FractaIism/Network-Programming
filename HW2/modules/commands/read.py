@@ -1,4 +1,3 @@
-from modules.SharedVariables import SharedVariables
 from modules.utility import *
 
 # Usage: read <post-S/N>
@@ -20,4 +19,3 @@ def read(sv: SharedVariables):
     for comment in comments.fetchall():
         post.append(comment)
     sv.tcp_conn.send(MSG_Encode(0, json.dumps(post)))
-    print("read success")

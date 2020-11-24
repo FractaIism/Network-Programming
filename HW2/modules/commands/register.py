@@ -1,4 +1,3 @@
-from modules.SharedVariables import SharedVariables
 from modules.utility import *
 
 # Usage: register <username> <email> <password>
@@ -13,4 +12,3 @@ def register(sv: SharedVariables):
     # add user to database
     sv.sqlite_cursor.execute("INSERT INTO users ('username','email','password') VALUES (?,?,?)", sv.argv[1:4])
     sv.udp_conn.send(MSG_Encode(0, "Register successfully."))
-    print("register success")
