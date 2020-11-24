@@ -16,5 +16,3 @@ from modules.commands.read import *
 from modules.commands.register import *
 from modules.commands.update_post import *
 from modules.commands.whoami import *
-
-# from modules.commands.test import *
