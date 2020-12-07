@@ -32,3 +32,11 @@ update-post 1 --content Hello, it's a brand new day!
 read 1
 delete-post 1
 list-post yee_haw
+
+
+register x y z
+login x z
+create-board b1
+create-post b1 --title hello<br>world --content this is <br> my post<br>
+create-post b1 --title yee --content woo<br>hoo<br>rrrrr
+list-post b1
