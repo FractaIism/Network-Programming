@@ -5,12 +5,12 @@ class SharedVariables:
     def __init__(self):
         self.tcp_conn = None  # type: socket.SocketKind.SOCK_STREAM
         self.udp_conn = None  # type:socket.SocketKind.SOCK_DGRAM
-        # self.sock_type = None  # type:socket.SocketKind
         self.addr = None  # type:Tuple[str,int]
         self.sqlite_conn = None  # type: sqlite3.Connection
         self.sqlite_cursor = None  # type:sqlite3.Cursor
         self.session_id = None  # type:int
         self.username = None  # type:str
+        self.chatroom_port = None  # type:int
         self.argc = None  # type:int
         self.argv = None  # type:list
 

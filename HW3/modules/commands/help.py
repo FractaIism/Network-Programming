@@ -17,5 +17,10 @@ def command_list(sv: SharedVariables):
         delete-post <post-S/N>
         update-post <post-S/N> --title/content <new>
         comment <post-S/N> <comment>
+        create-chatroom <port>
+        list-chatroom
+        join-chatroom <chatroom_name>
+        attach
+        restart-chatroom
         exit
     ''')))

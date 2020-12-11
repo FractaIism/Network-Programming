@@ -2,6 +2,8 @@
 
 from modules.SharedVariables import SharedVariables
 from modules.utility import ExceptionInfo, DoCMD
+import modules.chatroom.chatroom_server as chatroom_server
+import modules.chatroom.chatroom_client as chatroom_client
 from params import *
 import socket, json
 
@@ -13,6 +15,8 @@ def main():
     sv.tcp_conn.connect((remoteHost, remotePort))
     sv.udp_conn = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sv.addr = (remoteHost, remotePort)
+    (localHost, localPort) = sv.tcp_conn.getsockname()  # client machine hostname and port, not localhost!
+    sv.udp_conn.bind((localHost, localPort))
 
     # print(f"Connected to server at {remoteHost}:{remotePort}")
     print("********************************")
@@ -20,8 +24,13 @@ def main():
     print("********************************")
 
     try:
+        last_msg = None
         while True:
-            input_str = input('% ')
+            if last_msg is None:
+                input_str = input('% ')
+            else:
+                input_str = last_msg  # when returning from chatroom client
+                last_msg = None
             # check for empty command
             argv = input_str.split()
             argc = len(argv)
@@ -29,7 +38,64 @@ def main():
                 continue
             command = argv[0]
 
-            if command == 'register':
+            if command == 'create-chatroom':
+                (retcode, message) = DoCMD(sv, input_str + ' ' + localHost, "TCP")
+                if retcode != 0:
+                    print(message)
+                else:
+                    print("Start to create chatroom …")
+                    sv.chatroom_port = int(argv[1])
+                    chatroom_server.chatroom_server(sv.username, sv.chatroom_port)
+                    chatroom_server.input_thread.join()
+                    print("Welcome back to BBS.")
+                    if chatroom_server.status == 'leave':
+                        DoCMD(sv, "close-chatroom", "TCP")
+
+            elif command == 'list-chatroom':
+                (retcode, message) = DoCMD(sv, input_str, "UDP")
+                print("{:<15} {:<15}".format("Chatroom_name", "Status"))
+                if retcode != 0:
+                    print(message)
+                else:
+                    for name, status in json.loads(message):
+                        print("{:<15} {:<15}".format(name, status))
+
+            elif command == 'join-chatroom':
+                (retcode, message) = DoCMD(sv, input_str, "TCP")
+                if retcode != 0:
+                    print(message)
+                else:
+                    addr = tuple(json.loads(message))
+                    chatroom_client.chatroom_client(sv.username, addr)
+                    chatroom_client.input_thread.join()
+                    last_msg = chatroom_client.last_msg
+
+            elif command == 'attach':
+                if sv.session_id == -1:
+                    print("Please login first.")
+                elif not chatroom_server.server_online:
+                    print("Please create-chatroom first.")
+                else:
+                    chatroom_server.attach()
+                    chatroom_server.input_thread.join()
+                    print("Welcome back to BBS.")
+                    if chatroom_server.status == 'leave':
+                        DoCMD(sv, "close-chatroom", "TCP")
+
+            elif command == 'restart-chatroom':
+                (retcode, message) = DoCMD(sv, input_str, "TCP")
+                if retcode != 0:
+                    print(message)
+                else:
+                    print("Start to create chatroom …")
+                    sv.chatroom_port = int(message)
+                    chatroom_server.chatroom_server(sv.username, sv.chatroom_port)
+                    chatroom_server.input_thread.join()
+                    print("Welcome back to BBS.")
+                    if chatroom_server.status == 'leave':
+                        DoCMD(sv, "close-chatroom", "TCP")
+
+            elif command == 'register':
                 (retcode, message) = DoCMD(sv, input_str, "UDP")
                 print(message)
 
@@ -129,11 +195,12 @@ def main():
 
     except ConnectionError:
         ExceptionInfo()
-        sv.tcp_conn.close()
-        exit()
-    # except Exception as e:
-    #     ExceptionInfo()
-    pass
+    sv.tcp_conn.close()
+    exit()
+
+# except Exception as e:
+#     ExceptionInfo()
+pass
 
 if __name__ == '__main__':
     main()

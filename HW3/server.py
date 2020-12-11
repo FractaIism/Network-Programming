@@ -17,11 +17,11 @@ def main():
             );
             CREATE TABLE sessions (
                 session_id  INT  PRIMARY KEY,
-                username  TEXT
+                username    TEXT
             );
             CREATE TABLE boards (
-                idx  INTEGER  PRIMARY KEY  AUTOINCREMENT,
-                name   TEXT,
+                idx        INTEGER  PRIMARY KEY  AUTOINCREMENT,
+                name       TEXT,
                 moderator  TEXT
             );
             CREATE TABLE posts (
@@ -33,10 +33,16 @@ def main():
                 date    DATETIME  DEFAULT CURRENT_TIMESTAMP
             );
             CREATE TABLE comments (
-                idx    INTEGER  PRIMARY KEY  AUTOINCREMENT,
+                idx      INTEGER  PRIMARY KEY  AUTOINCREMENT,
                 post_sn  INT,
                 content  TEXT,
                 author   TEXT
+            );
+            CREATE TABLE chatrooms (
+                name  TEXT  PRIMARY KEY,
+                host  TEXT,
+                port  INT,
+                status TEXT
             );
         ''')
         sqlite_conn.commit()
@@ -95,19 +101,23 @@ def parseCommandTCP(tcp_conn: socket.socket, addr):
 
     # BBS commands, update this dict when commands are added/changed/deleted
     command_map = {
-        "login"       : login,
-        "logout"      : logout,
-        "list-user"   : list_user,
-        "create-board": create_board,
-        "list-board"  : list_board,
-        "create-post" : create_post,
-        "update-post" : update_post,
-        "delete-post" : delete_post,
-        "list-post"   : list_post,
-        "read"        : read,
-        "comment"     : comment,
-        "exit"        : client_exit,
-        "help"        : command_list,
+        "login"           : login,
+        "logout"          : logout,
+        "list-user"       : list_user,
+        "create-board"    : create_board,
+        "list-board"      : list_board,
+        "create-post"     : create_post,
+        "update-post"     : update_post,
+        "delete-post"     : delete_post,
+        "list-post"       : list_post,
+        "read"            : read,
+        "comment"         : comment,
+        "create-chatroom" : create_chatroom,
+        "join-chatroom"   : join_chatroom,
+        "close-chatroom"  : close_chatroom,  # system command
+        "restart-chatroom": restart_chatroom,
+        "exit"            : client_exit,
+        "help"            : command_list,
     }
 
     # bind SharedVariables object to each command function
@@ -130,7 +140,7 @@ def parseCommandTCP(tcp_conn: socket.socket, addr):
             else:
                 # unused, handled on client side
                 raise RuntimeError(886068, f"Unknown command '{command}'.")
-            print(command+" success")
+            print(command + " success")
 
         except RuntimeError as err:
             # raise RuntimeError to print error on both client and server
@@ -170,6 +180,11 @@ def parseCommandUDP(data, addr):
             register(sv)
         elif command == 'whoami':
             whoami(sv)
+        elif command == 'list-chatroom':
+            list_chatroom(sv)
+        else:
+            raise RuntimeError(886068, f"Unknown command '{command}'.")
+        print(command + " success")
 
     except RuntimeError as err:
         (errcode, errmsg) = err.args
