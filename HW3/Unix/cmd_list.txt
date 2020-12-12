@@ -1,0 +1,13 @@
+register x x x
+login x x
+create-chatroom 6869
+
+
+register y y y
+login y y
+join-chatroom x
+
+
+register z z z
+login z z
+join-chatroom x

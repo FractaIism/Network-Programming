@@ -4,6 +4,8 @@
 *.xml
 *.iml
 *.db
-test.py
+test*.py
 *.txt
 *.zip
+**/__pycache__
+*.pyc
