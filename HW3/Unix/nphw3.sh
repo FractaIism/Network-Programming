@@ -26,10 +26,10 @@ tmux split-window -h -p 50
 tmux select-pane -t 0
 tmux split-window -h -p 50
 
-tmux send-keys -t 0 "cd ~/NP/HW3" Enter
-tmux send-keys -t 1 "cd ~/NP/HW3" Enter
-tmux send-keys -t 2 "cd ~/NP/HW3" Enter
-tmux send-keys -t 3 "cd ~/NP/HW3" Enter
+tmux send-keys -t 0 "cd ~/NP/HW3/Unix" Enter
+tmux send-keys -t 1 "cd ~/NP/HW3/Unix" Enter
+tmux send-keys -t 2 "cd ~/NP/HW3/Unix" Enter
+tmux send-keys -t 3 "cd ~/NP/HW3/Unix" Enter
 
 if [ -n "${VENV}" ]; then
     echo "use venv"

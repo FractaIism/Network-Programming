@@ -36,7 +36,7 @@ def listener(chatroom_port):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)  # can't work on linux without this, WTF?
-    server_socket.bind(('localhost', chatroom_port))
+    server_socket.bind(('', chatroom_port))
     server_socket.listen(5)
     server_socket.setblocking(False)
     try:
